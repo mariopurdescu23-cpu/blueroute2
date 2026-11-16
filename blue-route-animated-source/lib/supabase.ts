@@ -1,0 +1,9 @@
+import "server-only";
+import {createClient} from "@supabase/supabase-js";
+export function configured(){return Boolean(process.env.SUPABASE_URL&&process.env.SUPABASE_SERVICE_ROLE_KEY)}
+export function getStore(){
+ const url=process.env.SUPABASE_URL;const key=process.env.SUPABASE_SERVICE_ROLE_KEY;
+ if(!url||!key)throw new Error("Database not configured");
+ return createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
+}
+export const bucket=()=>process.env.SUPABASE_STORAGE_BUCKET||"blue-route-documents";

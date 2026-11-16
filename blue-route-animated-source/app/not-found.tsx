@@ -1,0 +1,1 @@
+export default function NotFound(){return <main className="container detail-hero"><div className="eyebrow">BLUE ROUTE / 404</div><h1>Găsim o altă direcție.</h1><p className="lead">Pagina căutată nu există.</p><a className="button" href="/" style={{marginTop:30}}>Înapoi la pagina principală ↗</a></main>}
