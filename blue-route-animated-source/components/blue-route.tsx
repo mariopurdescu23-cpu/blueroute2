@@ -23,7 +23,7 @@ export function BlueRoute({detail}:{detail?:Detail}){
  [t("Cum sunt gestionate documentele transmise?","How are submitted documents handled?"),t("Documentele sunt atașate solicitării și sunt accesibile echipei autorizate din panoul de administrare. Nu sunt publicate în portofoliu.","Documents are attached to your request and available to the authorised team in the administration panel. They are never published in the portfolio.")],
  ];
  return <>
- <div className="reading-progress" aria-hidden="true"><span/></div><a className="skip-link" href="#continut">{t("Salt la conținut","Skip to content")}</a>
+ <a className="skip-link" href="#continut">{t("Salt la conținut","Skip to content")}</a>
  <header className="site-header"><div className="nav-wrap"><Brand/><nav className={menu?"main-nav open":"main-nav"} aria-label={t("Navigare principală","Main navigation")}>{nav.map((n,i)=><a href={`${detail?"/":""}#${ids[i]}`} key={ids[i]} onClick={()=>setMenu(false)}>{n}</a>)}</nav><div className="nav-actions"><button className="language" onClick={()=>setLang(lang==="ro"?"en":"ro")} aria-label={t("Switch to English","Schimbă în română")}><Globe size={14}/>{lang.toUpperCase()}</button><button className="button small" onClick={()=>launch()}>{t("Solicită o ofertă","Get a quote")}<ArrowUpRight size={16}/></button><button className="menu-toggle icon-button" aria-label={t("Meniu","Menu")} aria-expanded={menu} onClick={()=>setMenu(!menu)}>{menu?<X/>:<Menu/>}</button></div></div></header>
  <main id="continut">
  {detail?<>

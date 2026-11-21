@@ -71,7 +71,6 @@ export function useSiteMotion() {
    const aboutImage = root.querySelector<HTMLElement>(".about-image");
    const process = root.querySelector<HTMLElement>(".process-grid");
    const header = document.querySelector<HTMLElement>(".site-header");
-   const progress = document.querySelector<HTMLElement>(".reading-progress span");
    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
    let heroVisible = true;
    let frame = 0;
@@ -80,8 +79,6 @@ export function useSiteMotion() {
    const render = () => {
     frame = 0;
     const height = window.innerHeight;
-    const distance = document.documentElement.scrollHeight - height;
-    if (progress) progress.style.transform = `scaleX(${distance > 0 ? window.scrollY / distance : 0})`;
     header?.toggleAttribute("data-scrolled", window.scrollY > 24);
     x += (targetX - x) * .09;
     y += (targetY - y) * .09;
@@ -156,7 +153,6 @@ export function useSiteMotion() {
     aboutImage?.style.removeProperty("--image-shift");
     process?.style.removeProperty("--route-progress");
     header?.removeAttribute("data-scrolled");
-    if (progress) progress.style.transform = "scaleX(0)";
    };
   };
 
