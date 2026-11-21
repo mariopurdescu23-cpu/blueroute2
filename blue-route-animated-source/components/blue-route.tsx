@@ -6,7 +6,11 @@ import {QuoteForm} from "./quote-form";
 import {company} from "@/lib/company";
 import {useSiteMotion} from "@/lib/use-site-motion";
 type Detail={kind:"service"|"article"|"privacy";slug?:string};
-export function Brand(){return <a href="/" className="brand" aria-label="BLUE ROUTE — Acasă"><span className="brand-mark"><span/><span/><span/></span><span>BLUE ROUTE<small>PUBLIC PROCUREMENT CONSULTING</small></span></a>}
+export function Brand(){
+ return <a href="/" className="brand" aria-label="BLUE ROUTE — Acasă">
+  <img className="brand-logo" src="/blue-route-logo.png" alt="BLUE ROUTE" width={840} height={138}/>
+ </a>;
+}
 export function BlueRoute({detail}:{detail?:Detail}){
  const[lang,setLang]=useState<"ro"|"en">("ro");const[menu,setMenu]=useState(false);const[quote,setQuote]=useState(false);const[code,setCode]=useState("");const[faq,setFaq]=useState<number|null>(0);const[filter,setFilter]=useState(0);
  const t=(ro:string,en:string)=>lang==="ro"?ro:en;
