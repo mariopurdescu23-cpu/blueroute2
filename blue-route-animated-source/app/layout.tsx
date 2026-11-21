@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "./globals.css";
+import "./site.css";
 export const metadata: Metadata = {
  title: {default:"BLUE ROUTE — O direcție clară pentru proiecte ambițioase",template:"%s | BLUE ROUTE"},
  description:"Consultanță în achiziții publice pentru construcții. Documentații de calificare, propuneri tehnice și financiare. Solicită o ofertă pentru licitația ta SEAP.",
