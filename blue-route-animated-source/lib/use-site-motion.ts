@@ -7,6 +7,7 @@ export function useSiteMotion() {
   const root = document.getElementById("continut");
   if (!root || !window.IntersectionObserver || !Element.prototype.animate) return;
   const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const revealed = new WeakSet<Element>();
   let teardown = () => {};
 
   const configure = () => {
@@ -14,7 +15,6 @@ export function useSiteMotion() {
    if (preference.matches) return;
 
    root.classList.add("motion-enabled");
-   const seen = new WeakSet<Element>();
    const animations = new Set<Animation>();
    const pending = new Set<HTMLElement>();
    let disposed = false;
@@ -38,19 +38,25 @@ export function useSiteMotion() {
    };
 
    const observer = new IntersectionObserver(entries => {
+    if (disposed) return;
     for (const entry of entries) {
-     if (!entry.isIntersecting) continue;
-     observer.unobserve(entry.target);
-     reveal(entry.target as HTMLElement);
+     const element = entry.target as HTMLElement;
+     if (!entry.isIntersecting || revealed.has(element) || !pending.has(element)) continue;
+     revealed.add(element);
+     observer.unobserve(element);
+     reveal(element);
     }
    }, {threshold:.08, rootMargin:"0px 0px -5% 0px"});
 
    const register = () => {
     if (disposed) return;
     root.querySelectorAll<HTMLElement>(".reveal,.about-copy > *,.project-row,.faq-item,.detail-hero > *,.detail-body > *").forEach(element => {
-     if (seen.has(element)) return;
-     seen.add(element);
-     if (element.getBoundingClientRect().bottom < 0) return;
+     if (revealed.has(element) || pending.has(element)) return;
+     // Content already visible at hydration or a restored scroll position should stay visible.
+     if (element.getBoundingClientRect().top < window.innerHeight) {
+      revealed.add(element);
+      return;
+     }
      element.dataset.motionPending = "true";
      pending.add(element);
      observer.observe(element);
@@ -79,13 +85,13 @@ export function useSiteMotion() {
     header?.toggleAttribute("data-scrolled", window.scrollY > 24);
     x += (targetX - x) * .09;
     y += (targetY - y) * .09;
-    if (heroPhoto && hero && heroVisible) {
+    if (finePointer.matches && heroPhoto && hero && heroVisible) {
      const position = hero.getBoundingClientRect();
      const shift = Math.min(Math.max(-position.top * .14, 0), 65);
      heroPhoto.style.setProperty("--photo-x", `${x}px`);
      heroPhoto.style.setProperty("--photo-y", `${shift + y}px`);
     }
-    if (aboutImage) {
+    if (finePointer.matches && aboutImage) {
      const position = aboutImage.getBoundingClientRect();
      if (position.top < height && position.bottom > 0) {
       const shift = Math.max(-28, Math.min(28, (height / 2 - position.top - position.height / 2) * .08));
@@ -107,7 +113,16 @@ export function useSiteMotion() {
     schedule();
    };
    const reset = () => { targetX = 0; targetY = 0; schedule(); };
+   const updatePointerMotion = () => {
+    heroPhoto?.style.removeProperty("--photo-x");
+    heroPhoto?.style.removeProperty("--photo-y");
+    aboutImage?.style.removeProperty("--image-shift");
+    x = 0;
+    y = 0;
+    reset();
+   };
    const visibility = new IntersectionObserver(entries => {
+    if (disposed) return;
     heroVisible = entries[0]?.isIntersecting ?? false;
     if (hero) hero.dataset.inView = String(heroVisible);
     if (heroVisible) schedule();
@@ -119,6 +134,7 @@ export function useSiteMotion() {
    }
    window.addEventListener("scroll", schedule, {passive:true});
    window.addEventListener("resize", schedule, {passive:true});
+   finePointer.addEventListener("change", updatePointerMotion);
    schedule();
 
    teardown = () => {
@@ -129,6 +145,7 @@ export function useSiteMotion() {
     cancelAnimationFrame(frame);
     window.removeEventListener("scroll", schedule);
     window.removeEventListener("resize", schedule);
+    finePointer.removeEventListener("change", updatePointerMotion);
     hero?.removeEventListener("pointermove", move);
     hero?.removeEventListener("pointerleave", reset);
     pending.forEach(element => delete element.dataset.motionPending);
