@@ -1,5 +1,5 @@
 "use client";
-import {useEffect,useState} from "react";
+import {useEffect,useRef,useState} from "react";
 import {ArrowUpRight,ArrowRight,ArrowDown,Menu,X,Check,ShieldCheck,LockKeyhole,FileText,Layers,MoveUpRight,Plus,Minus,Globe,Compass,Clock3} from "lucide-react";
 import {services,domains,articles} from "@/lib/content";
 import {QuoteForm} from "./quote-form";
@@ -16,6 +16,7 @@ export function BlueRoute({detail}:{detail?:Detail}){
  const[lang,setLang]=useState<"ro"|"en">("ro");const[menu,setMenu]=useState(false);const[quote,setQuote]=useState(false);const[code,setCode]=useState("");const[faq,setFaq]=useState<number|null>(0);const[filter,setFilter]=useState(0);
  const t=(ro:string,en:string)=>lang==="ro"?ro:en;
  const [cookiesOpen,setCookiesOpen]=useState(false);
+ const languageDialog=useRef<HTMLDialogElement>(null);
  useEffect(()=>{
   try{
    const choice=localStorage.getItem(preferenceKey);
@@ -26,10 +27,10 @@ export function BlueRoute({detail}:{detail?:Detail}){
   }
  },[detail?.kind]);
  useEffect(()=>{document.documentElement.lang=lang},[lang]);
- function switchLanguage(){
-  const next=lang==="ro"?"en":"ro";
+ function selectLanguage(next:"ro"|"en"){
   setLang(next);
   try{if(localStorage.getItem(preferenceKey)==="language")localStorage.setItem(languageKey,next)}catch{}
+  languageDialog.current?.close();
  }
  useSiteMotion();
  const nav=[t("Servicii","Services"),t("Expertiză","Expertise"),t("Cum lucrăm","Our process"),t("Despre noi","About"),t("Resurse","Insights")];const ids=["servicii","expertiza","proces","despre","resurse"];
@@ -43,7 +44,7 @@ export function BlueRoute({detail}:{detail?:Detail}){
  ];
  return <>
  <a className="skip-link" href="#continut">{t("Salt la conținut","Skip to content")}</a>
- <header className="site-header"><div className="nav-wrap"><Brand/><nav id="primary-navigation" className={menu?"main-nav open":"main-nav"} aria-label={t("Navigare principală","Main navigation")}>{nav.map((n,i)=><a href={`${detail?"/":""}#${ids[i]}`} key={ids[i]} onClick={()=>setMenu(false)}>{n}</a>)}</nav><div className="nav-actions"><button className="language" onClick={switchLanguage} aria-label={t("Switch to English","Schimbă în română")}><Globe size={14}/>{lang.toUpperCase()}</button><a href="/admin" className="nav-admin">{t("Administrare","Admin")}</a><button className="button small" onClick={()=>launch()}>{t("Solicită o ofertă","Get a quote")}<ArrowUpRight size={16}/></button><button className="menu-toggle icon-button" aria-label={t("Meniu","Menu")} aria-controls="primary-navigation" aria-expanded={menu} onClick={()=>setMenu(!menu)}>{menu?<X/>:<Menu/>}</button></div></div></header>
+ <header className="site-header"><div className="nav-wrap"><Brand/><nav id="primary-navigation" className={menu?"main-nav open":"main-nav"} aria-label={t("Navigare principală","Main navigation")}>{nav.map((n,i)=><a href={`${detail?"/":""}#${ids[i]}`} key={ids[i]} onClick={()=>setMenu(false)}>{n}</a>)}</nav><div className="nav-actions"><button type="button" className="language" aria-haspopup="dialog" onClick={()=>{setMenu(false);languageDialog.current?.showModal()}} aria-label={t("Alege limba","Choose language")}>{lang==="ro"?<span className="language-flag" aria-hidden="true"/>:<Globe size={17} aria-hidden="true"/>}{lang.toUpperCase()}</button><a href="/admin" className="nav-admin">{t("Administrare","Admin")}</a><button className="button small" onClick={()=>launch()}>{t("Solicită o ofertă","Get a quote")}<ArrowUpRight size={16}/></button><button className="menu-toggle icon-button" aria-label={t("Meniu","Menu")} aria-controls="primary-navigation" aria-expanded={menu} onClick={()=>setMenu(!menu)}>{menu?<X/>:<Menu/>}</button></div></div></header>
  <main id="continut">
  {detail?<>
  <section className="detail-hero container"><a className="back-link" href="/">← {t("Înapoi la pagina principală","Back to homepage")}</a><div className="eyebrow"><i/>{service?t("SERVICII SPECIALIZATE","SPECIALISED SERVICES"):article?t(article.category,article.categoryEn):t("DATE & CONFIDENȚIALITATE","DATA & PRIVACY")}</div><h1>{service?t(service.ro,service.en):article?t(article.ro,article.en):t("Confidențialitate, cu claritate.","Privacy, with clarity.")}</h1><p className="lead">{service?t(service.desc,service.descEn):article?t("Note practice pentru o ofertare bine organizată.","Practical notes for a well-organised tender."):t("Informații despre datele transmise prin formular.","Information about data submitted through our form.")}</p></section>
@@ -117,6 +118,27 @@ export function BlueRoute({detail}:{detail?:Detail}){
   </div>
  </footer>
  <CookiePreferences lang={lang} open={cookiesOpen} onClose={()=>setCookiesOpen(false)}/>
+ <dialog className="language-dialog" ref={languageDialog} aria-labelledby="language-dialog-title"
+  onClick={event=>{if(event.target===event.currentTarget)languageDialog.current?.close()}}>
+  <div className="language-dialog-content">
+   <div className="language-dialog-heading">
+    <h2 id="language-dialog-title">{t("Alege limba site-ului","Choose the site language")}</h2>
+    <button type="button" className="icon-button" onClick={()=>languageDialog.current?.close()} aria-label={t("Închide","Close")}><X size={20} aria-hidden="true"/></button>
+   </div>
+   <div className="language-options">
+    <button type="button" lang="ro" aria-pressed={lang==="ro"} onClick={()=>selectLanguage("ro")}>
+     <span className="language-flag" aria-hidden="true"/>
+     <span><strong>Română</strong><small>România</small></span>
+     {lang==="ro"&&<Check size={18} aria-hidden="true"/>}
+    </button>
+    <button type="button" lang="en" aria-pressed={lang==="en"} onClick={()=>selectLanguage("en")}>
+     <span className="language-international"><Globe size={18} aria-hidden="true"/></span>
+     <span><strong>English</strong><small>International</small></span>
+     {lang==="en"&&<Check size={18} aria-hidden="true"/>}
+    </button>
+   </div>
+  </div>
+ </dialog>
  {quote&&<QuoteForm lang={lang} initialCode={code} onClose={()=>setQuote(false)}/>}
  </>;
 }

@@ -58,6 +58,23 @@
 .nav-actions .language,.nav-admin{font-size:13px;font-weight:650;color:var(--ink)}
 .nav-actions .language{min-height:40px;padding:0 9px;border-radius:8px}
 .nav-actions .language:hover{background:#edf4ff}
+.language-flag{display:block;width:18px;height:18px;flex-shrink:0;border-radius:50%;background:linear-gradient(90deg,#164aaf 33.33%,#f9cf32 33.33% 66.66%,#cf2534 66.66%)}
+.language-dialog{position:fixed;inset:0;margin:auto;width:min(620px,calc(100% - 28px));max-width:none;max-height:calc(100dvh - 28px);overflow:auto;padding:0;border:1px solid #dbe6f4;border-radius:16px;background:white;color:var(--ink);box-shadow:0 22px 80px #071b3533}
+.language-dialog::backdrop{background:#07172c74}
+.language-dialog-content{padding:clamp(20px,5vw,32px)}
+.language-dialog-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}
+.language-dialog-heading h2{font-size:clamp(20px,4vw,25px);font-weight:750}
+.language-dialog-heading button{min-width:40px;min-height:40px;border-radius:8px}
+.language-dialog-heading button:hover{background:#edf4ff}
+.language-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.language-options button{display:flex;align-items:center;gap:12px;min-height:74px;padding:12px;border:1px solid #dbe6f4;border-radius:10px;background:#f8faff;color:var(--ink);text-align:left}
+.language-options button:hover,.language-options button[aria-pressed="true"]{border-color:#4678e4;background:#edf4ff}
+.language-options button>svg{margin-left:auto;flex-shrink:0;color:#175bfb}
+.language-options .language-flag,.language-international{width:30px;height:30px}
+.language-international{display:grid;place-items:center;flex-shrink:0;border-radius:50%;background:#dceaff;color:#175bfb}
+.language-options strong,.language-options small{display:block}
+.language-options small{font-size:12px;color:#40516b}
+@media(max-width:460px){.language-options{grid-template-columns:1fr}}
 .nav-admin{display:inline-flex;align-items:center;min-height:40px;padding:0 14px;border:1px solid #cad8ec;border-radius:8px}
 .nav-admin:hover{background:#edf4ff;color:#1747a6}
 .nav-actions>.button{min-height:40px;padding:10px 14px;gap:9px;border-radius:8px;font-size:13px}
