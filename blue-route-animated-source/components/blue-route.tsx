@@ -1,6 +1,6 @@
 "use client";
-import {useEffect,useState} from "react";
-import {ArrowUpRight,ArrowRight,ArrowDown,Menu,X,Check,ShieldCheck,FileText,Layers,MoveUpRight,Plus,Minus,Globe,Compass,Clock3} from "lucide-react";
+import {useCallback,useEffect,useRef,useState} from "react";
+import {ArrowUpRight,ArrowRight,ArrowDown,Menu,X,Check,ShieldCheck,FileText,Layers,MoveUpRight,Plus,Minus,ChevronDown,Compass,Clock3} from "lucide-react";
 import {services,domains,articles} from "@/lib/content";
 import {QuoteForm} from "./quote-form";
 import {company} from "@/lib/company";
@@ -9,12 +9,45 @@ type Detail={kind:"service"|"article"|"privacy";slug?:string};
 export function Brand(){return <a href="/" className="brand" aria-label="BLUE ROUTE — Acasă"><span className="brand-mark"><span/><span/><span/></span><span>BLUE ROUTE<small>PUBLIC PROCUREMENT CONSULTING</small></span></a>}
 export function BlueRoute({detail}:{detail?:Detail}){
  const[lang,setLang]=useState<"ro"|"en">("ro");const[menu,setMenu]=useState(false);const[quote,setQuote]=useState(false);const[code,setCode]=useState("");const[faq,setFaq]=useState<number|null>(0);const[filter,setFilter]=useState(0);
+ const [languageOpen,setLanguageOpen]=useState(false);
+ const menuToggle=useRef<HTMLButtonElement>(null);
+ const languageToggle=useRef<HTMLButtonElement>(null);
+ const closeMenu=useCallback(()=>{
+  setMenu(false);
+  menuToggle.current?.focus();
+ },[]);
  const t=(ro:string,en:string)=>lang==="ro"?ro:en;
  useEffect(()=>{const l=localStorage.getItem("br-language");if(l==="en")setLang("en")},[]);
  useEffect(()=>{document.documentElement.lang=lang;localStorage.setItem("br-language",lang)},[lang]);
+ useEffect(()=>{
+  const desktop=window.matchMedia("(min-width: 901px)");
+  const closeOnResize=()=>{
+   if (desktop.matches) setMenu(false);
+   else setLanguageOpen(false);
+  };
+  desktop.addEventListener("change",closeOnResize);
+  return ()=>desktop.removeEventListener("change",closeOnResize);
+ },[]);
+ useEffect(()=>{
+  if (!menu) return;
+  const onEscape=(event:KeyboardEvent)=>{if (event.key==="Escape") closeMenu()};
+  window.addEventListener("keydown",onEscape);
+  return ()=>window.removeEventListener("keydown",onEscape);
+ },[menu,closeMenu]);
  useSiteMotion();
  const nav=[t("Servicii","Services"),t("Expertiză","Expertise"),t("Cum lucrăm","Our process"),t("Despre noi","About"),t("Resurse","Insights")];const ids=["servicii","expertiza","proces","despre","resurse"];
- const launch=(v="")=>{setCode(v);setQuote(true);setMenu(false)};
+ const closeLanguage=()=>{
+  setLanguageOpen(false);
+  languageToggle.current?.focus();
+ };
+ const launch=(v="")=>{
+  if (menu) closeMenu();
+  setCode(v);
+  setQuote(true);
+ };
+ const languageLabel=t("Limbă","Language");
+ const quoteLabel=t("Solicită o ofertă","Get a quote");
+ const navLabel=t("Navigare principală","Main navigation");
  const service=detail?.kind==="service"?services.find(s=>s.slug===detail.slug):null;const article=detail?.kind==="article"?articles.find(s=>s.slug===detail.slug):null;
  const faqs=[
  [t("Pot solicita doar o parte din documentație?","Can I request only part of the documentation?"),t("Da. Poți alege analiza preliminară, documentația de calificare, propunerea tehnică, propunerea financiară sau asistența pentru clarificări. Stabilim împreună ce este necesar pentru procedura ta.","Yes. Choose tender assessment, qualification documents, technical proposal, financial proposal or clarification support. We agree the scope based on your procedure.")],
@@ -23,9 +56,59 @@ export function BlueRoute({detail}:{detail?:Detail}){
  [t("Cum sunt gestionate documentele transmise?","How are submitted documents handled?"),t("Documentele sunt atașate solicitării și sunt accesibile echipei autorizate din panoul de administrare. Nu sunt publicate în portofoliu.","Documents are attached to your request and available to the authorised team in the administration panel. They are never published in the portfolio.")],
  ];
  return <>
- <a className="skip-link" href="#continut">{t("Salt la conținut","Skip to content")}</a>
- <header className="site-header"><div className="nav-wrap"><Brand/><nav className={menu?"main-nav open":"main-nav"} aria-label={t("Navigare principală","Main navigation")}>{nav.map((n,i)=><a href={`${detail?"/":""}#${ids[i]}`} key={ids[i]} onClick={()=>setMenu(false)}>{n}</a>)}</nav><div className="nav-actions"><button className="language" onClick={()=>setLang(lang==="ro"?"en":"ro")} aria-label={t("Switch to English","Schimbă în română")}><Globe size={14}/>{lang.toUpperCase()}</button><button className="button small" onClick={()=>launch()}>{t("Solicită o ofertă","Get a quote")}<ArrowUpRight size={16}/></button><button className="menu-toggle icon-button" aria-label={t("Meniu","Menu")} aria-expanded={menu} onClick={()=>setMenu(!menu)}>{menu?<X/>:<Menu/>}</button></div></div></header>
- <main id="continut">
+ <a className="skip-link" href="#continut" inert={menu}>{t("Salt la conținut","Skip to content")}</a>
+ <header className="site-header" data-menu-open={menu||undefined}>
+  <div className="nav-wrap">
+   <Brand/>
+   <nav className="main-nav" aria-label={navLabel}>
+    {nav.map((label,i)=><a href={`${detail?"/":""}#${ids[i]}`} key={ids[i]}>{label}</a>)}
+   </nav>
+   <div className="nav-actions">
+    <div className="nav-language" data-open={languageOpen||undefined}
+     onPointerEnter={event=>{if (event.pointerType==="mouse") setLanguageOpen(true)}}
+     onPointerLeave={event=>{
+      if (event.pointerType==="mouse" && !event.currentTarget.contains(document.activeElement)) setLanguageOpen(false);
+     }}
+     onBlur={event=>{if (!event.currentTarget.contains(event.relatedTarget)) setLanguageOpen(false)}}
+     onKeyDown={event=>{if (event.key==="Escape" && languageOpen) closeLanguage()}}>
+     <button type="button" className="language" ref={languageToggle} aria-label={languageLabel}
+      aria-expanded={languageOpen} aria-controls="nav-languages"
+      onClick={()=>setLanguageOpen(open=>!open)}>{lang.toUpperCase()}<ChevronDown size={14}/></button>
+     <div id="nav-languages" className="nav-language-options" inert={!languageOpen}>
+      <div role="group" aria-label={languageLabel}>
+       <button type="button" lang="ro" aria-pressed={lang==="ro"} onClick={()=>{setLang("ro");closeLanguage()}}>Română{lang==="ro"&&<Check size={14}/>}</button>
+       <button type="button" lang="en" aria-pressed={lang==="en"} onClick={()=>{setLang("en");closeLanguage()}}>English{lang==="en"&&<Check size={14}/>}</button>
+      </div>
+     </div>
+    </div>
+    <button type="button" className="button small nav-quote" onClick={()=>launch()}>{quoteLabel}<ArrowUpRight size={16}/></button>
+    <button type="button" className="menu-toggle icon-button" ref={menuToggle}
+     aria-label={menu?t("Închide meniul","Close menu"):t("Deschide meniul","Open menu")}
+     aria-expanded={menu} aria-controls="mobile-menu" onClick={event=>{
+      event.currentTarget.focus();
+      setMenu(open=>!open);
+     }}>
+     {menu?<X aria-hidden="true"/>:<Menu aria-hidden="true"/>}
+    </button>
+   </div>
+  </div>
+  <div className="mobile-menu" id="mobile-menu" inert={!menu}>
+   <div className="mobile-menu-content">
+    <nav aria-label={navLabel}>
+     {nav.map((label,i)=><a href={`${detail?"/":""}#${ids[i]}`} key={ids[i]} onClick={closeMenu}>{label}</a>)}
+    </nav>
+    <button type="button" className="mobile-menu-quote" onClick={()=>launch()}>{quoteLabel}<ArrowRight size={20}/></button>
+    <div className="mobile-menu-language" role="group" aria-label={languageLabel}>
+     <span>{languageLabel}</span>
+     <div>
+      <button type="button" lang="ro" aria-label="Română" aria-pressed={lang==="ro"} onClick={()=>setLang("ro")}>RO</button>
+      <button type="button" lang="en" aria-label="English" aria-pressed={lang==="en"} onClick={()=>setLang("en")}>EN</button>
+     </div>
+    </div>
+   </div>
+  </div>
+ </header>
+ <main id="continut" inert={menu}>
  {detail?<>
  <section className="detail-hero container"><a className="back-link" href="/">← {t("Înapoi la pagina principală","Back to homepage")}</a><div className="eyebrow"><i/>{service?t("SERVICII SPECIALIZATE","SPECIALISED SERVICES"):article?t(article.category,article.categoryEn):t("DATE & CONFIDENȚIALITATE","DATA & PRIVACY")}</div><h1>{service?t(service.ro,service.en):article?t(article.ro,article.en):t("Confidențialitate, cu claritate.","Privacy, with clarity.")}</h1><p className="lead">{service?t(service.desc,service.descEn):article?t("Note practice pentru o ofertare bine organizată.","Practical notes for a well-organised tender."):t("Informații despre datele transmise prin formular.","Information about data submitted through our form.")}</p></section>
  <section className="detail-body container">{service?<div className="detail-columns"><div><h2>{t("Atenție la fiecare cerință.","Attention to every requirement.")}</h2><p>{t(service.body,service.bodyEn)}</p><h3>{t("Ce include serviciul","Service scope")}</h3><ul className="check-list">{(lang==="ro"?service.items:service.itemsEn).map(i=><li key={i}><Check size={18}/>{i}</li>)}</ul><p>{t("Livrabilele și calendarul se stabilesc în oferta de servicii, în funcție de documentația procedurii.","Deliverables and timing are agreed in the service quotation based on the procedure documentation.")}</p></div><aside className="detail-aside"><Compass size={32}/><h3>{t("Ai un proiect în pregătire?","Planning a project?")}</h3><p>{t("Spune-ne numărul procedurii și de ce ai nevoie. Pornim de la detaliile proiectului tău.","Tell us your procedure number and requirements. We start with your project details.")}</p><button className="button" onClick={()=>launch()}>{t("Solicită o ofertă","Request a quote")}<ArrowUpRight size={18}/></button></aside></div>:article?<article className="article-body"><div className="article-meta"><Clock3 size={15}/>{article.time} · {t("Ghid orientativ","General guide")}</div>{(lang==="ro"?article.paragraphs:article.paragraphsEn).map((p,i)=><p key={i}>{p}</p>)}<div className="article-note">{t("Material informativ general. Verifică întotdeauna cerințele și clarificările oficiale ale procedurii tale.","General information. Always verify the official requirements and clarifications for your specific procedure.")}</div><button className="button" onClick={()=>launch()}>{t("Discută despre licitația ta","Discuss your tender")}<ArrowUpRight size={18}/></button></article>:<article className="article-body"><h2>{t("Ce informații colectează formularul","Information collected by the form")}</h2><p>{t("Formularul colectează datele de contact și ale firmei, informațiile despre licitație, serviciile solicitate și documentele pe care alegi să le atașezi. Acestea sunt folosite pentru analiza solicitării și pregătirea unei oferte de servicii.","The form collects company and contact information, tender details, requested services and documents you choose to attach. These are used to assess your request and prepare a service quotation.")}</p><h3>{t("Acces și stocare","Access and storage")}</h3><p>{t("Solicitările sunt stocate în baza de date a aplicației, iar fișierele în spațiul privat de stocare. Accesul la administrare necesită un cont autorizat. Site-ul nu folosește cookie-uri de publicitate sau instrumente de analiză. Preferința de limbă se salvează local în browser.","Requests are stored in the application database and files in private storage. Administration requires an authorised account. The site uses no advertising cookies or analytics. Your language preference is stored locally in your browser.")}</p><h3>{t("Datele operatorului","Controller details")}</h3><p>{t("BLUE ROUTE SRL. Contactul prin e-mail sau telefon este disponibil la finalul paginii. Sediul, perioada de păstrare și procedura pentru solicitări privind datele personale trebuie completate înainte de lansarea publică.","BLUE ROUTE SRL. Contact details are listed in the page footer. The registered office, retention period and the procedure for personal-data enquiries must be completed before public launch.")}</p></article>}</section>
@@ -48,7 +131,7 @@ export function BlueRoute({detail}:{detail?:Detail}){
  <section className="faq-section section-space container"><div><div className="eyebrow"><i/>{t("ÎNTREBĂRI FRECVENTE","COMMON QUESTIONS")}</div><h2>{t("Bine de știut.","Good to know.")}</h2><p>{t("Câteva răspunsuri, înainte să începem.","A few answers before we begin.")}</p></div><div className="faq-list">{faqs.map((f,i)=><div className={`faq-item ${faq===i?"expanded":""}`} key={i}><button aria-expanded={faq===i} aria-controls={`faq-${i}`} onClick={()=>setFaq(faq===i?null:i)}>{f[0]}{faq===i?<Minus size={19}/>:<Plus size={19}/>}</button><div id={`faq-${i}`} className="faq-answer" aria-hidden={faq!==i} inert={faq!==i}><div><p>{f[1]}</p></div></div></div>)}</div></section>
  <section className="contact-section" id="contact"><div className="contact-grid"/><div className="container contact-inner"><div className="eyebrow"><i/>06 / {t("URMĂTORUL PAS","THE NEXT STEP")}</div><div className="contact-main"><h2>{t("Ai proiectul.","You have the project.")}<br/>{t("Hai să-i dăm","Let's give it")} <em>{t("direcție.","direction.")}</em></h2><button className="contact-circle" onClick={()=>launch()} aria-label={t("Solicită o ofertă","Request a quote")}><ArrowUpRight size={38}/></button></div><div className="contact-bottom"><p>{t("Trimite-ne licitația ta. Construim împreună următorul pas.","Share your tender. Let's build the next step together.")}</p><button className="button white" onClick={()=>launch()}>{t("Solicită o ofertă de consultanță","Request a consulting quote")}<ArrowUpRight size={18}/></button></div></div></section>
  </>}
- </main><footer className="site-footer"><div className="container"><div className="footer-top"><div><Brand/><p>{t("O direcție clară pentru proiecte ambițioase.","A clear direction for ambitious projects.")}</p></div><div className="footer-links"><span>{t("EXPLORARE","EXPLORE")}</span><a href="/#servicii">{t("Servicii","Services")}</a><a href="/#expertiza">{t("Expertiză","Expertise")}</a><a href="/#resurse">{t("Resurse","Insights")}</a></div><div className="footer-links"><span>CONTACT</span>{company.placeholder?<><span className="contact-placeholder">{company.email}</span><span className="contact-placeholder">{company.phone}</span></>:<><a href={`mailto:${company.email}`}>{company.email}</a><a href={`tel:${company.phone.replace(/[^+0-9]/g,"")}`}>{company.phone}</a>{company.whatsapp&&<a href={`https://wa.me/${company.whatsapp.replace(/\D/g,"")}`} target="_blank" rel="noreferrer">WhatsApp ↗</a>}</>}{company.placeholder&&<small>{t("Date de contact demonstrative","Placeholder contact details")}</small>}</div><div className="footer-links"><span>{t("SĂ ÎNCEPEM","LET'S BEGIN")}</span><button className="text-button" onClick={()=>launch()}>{t("Discută un proiect","Discuss a project")}<ArrowUpRight size={16}/></button><span>ROMÂNIA · RO / EN</span></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} BLUE ROUTE SRL</span><a href="/confidentialitate">{t("Confidențialitate","Privacy")}</a><a href="/admin">{t("Administrare","Administration")}<ArrowUpRight size={12}/></a><span>BUILT ON PRECISION.</span></div></div></footer>
+ </main><footer className="site-footer" inert={menu}><div className="container"><div className="footer-top"><div><Brand/><p>{t("O direcție clară pentru proiecte ambițioase.","A clear direction for ambitious projects.")}</p></div><div className="footer-links"><span>{t("EXPLORARE","EXPLORE")}</span><a href="/#servicii">{t("Servicii","Services")}</a><a href="/#expertiza">{t("Expertiză","Expertise")}</a><a href="/#resurse">{t("Resurse","Insights")}</a></div><div className="footer-links"><span>CONTACT</span>{company.placeholder?<><span className="contact-placeholder">{company.email}</span><span className="contact-placeholder">{company.phone}</span></>:<><a href={`mailto:${company.email}`}>{company.email}</a><a href={`tel:${company.phone.replace(/[^+0-9]/g,"")}`}>{company.phone}</a>{company.whatsapp&&<a href={`https://wa.me/${company.whatsapp.replace(/\D/g,"")}`} target="_blank" rel="noreferrer">WhatsApp ↗</a>}</>}{company.placeholder&&<small>{t("Date de contact demonstrative","Placeholder contact details")}</small>}</div><div className="footer-links"><span>{t("SĂ ÎNCEPEM","LET'S BEGIN")}</span><button className="text-button" onClick={()=>launch()}>{t("Discută un proiect","Discuss a project")}<ArrowUpRight size={16}/></button><span>ROMÂNIA · RO / EN</span></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} BLUE ROUTE SRL</span><a href="/confidentialitate">{t("Confidențialitate","Privacy")}</a><a href="/admin">{t("Administrare","Administration")}<ArrowUpRight size={12}/></a><span>BUILT ON PRECISION.</span></div></div></footer>
  {quote&&<QuoteForm lang={lang} initialCode={code} onClose={()=>setQuote(false)}/>}
  </>;
 }
