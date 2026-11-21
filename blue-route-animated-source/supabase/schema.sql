@@ -16,6 +16,7 @@ create table if not exists public.requests (
 create index if not exists requests_created_at_idx on public.requests (created_at desc);
 alter table public.requests enable row level security;
 revoke all on public.requests from anon, authenticated;
+grant select, insert, update on public.requests to service_role;
 -- All database operations use the server-only service role. No public read policies.
 insert into storage.buckets (id,name,public,file_size_limit)
 values ('blue-route-documents','blue-route-documents',false,26214400)
