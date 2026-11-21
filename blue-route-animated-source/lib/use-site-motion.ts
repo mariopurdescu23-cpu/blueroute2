@@ -74,17 +74,12 @@ export function useSiteMotion() {
    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
    let heroVisible = true;
    let frame = 0;
-   let lastScroll = Math.max(0, window.scrollY);
    let x = 0, y = 0, targetX = 0, targetY = 0;
 
    const render = () => {
     frame = 0;
     const height = window.innerHeight;
-    const scroll = Math.max(0, window.scrollY);
-    if (scroll !== lastScroll) {
-     header?.toggleAttribute("data-nav-hidden", scroll > 200 && scroll > lastScroll);
-     lastScroll = scroll;
-    }
+    header?.toggleAttribute("data-scrolled", window.scrollY > 24);
     x += (targetX - x) * .09;
     y += (targetY - y) * .09;
     if (finePointer.matches && heroPhoto && hero && heroVisible) {
@@ -157,7 +152,7 @@ export function useSiteMotion() {
     heroPhoto?.style.removeProperty("--photo-y");
     aboutImage?.style.removeProperty("--image-shift");
     process?.style.removeProperty("--route-progress");
-    header?.removeAttribute("data-nav-hidden");
+    header?.removeAttribute("data-scrolled");
    };
   };
 
