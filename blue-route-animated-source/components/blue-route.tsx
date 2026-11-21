@@ -3,6 +3,7 @@ import {useEffect,useState} from "react";
 import {ArrowUpRight,ArrowRight,ArrowDown,Menu,X,Check,ShieldCheck,LockKeyhole,FileText,Layers,MoveUpRight,Plus,Minus,Globe,Compass,Clock3} from "lucide-react";
 import {services,domains,articles} from "@/lib/content";
 import {QuoteForm} from "./quote-form";
+import {CookiePreferences,languageKey,preferenceKey} from "./cookie-preferences";
 import {company} from "@/lib/company";
 import {useSiteMotion} from "@/lib/use-site-motion";
 type Detail={kind:"service"|"article"|"privacy";slug?:string};
@@ -14,8 +15,22 @@ export function Brand(){
 export function BlueRoute({detail}:{detail?:Detail}){
  const[lang,setLang]=useState<"ro"|"en">("ro");const[menu,setMenu]=useState(false);const[quote,setQuote]=useState(false);const[code,setCode]=useState("");const[faq,setFaq]=useState<number|null>(0);const[filter,setFilter]=useState(0);
  const t=(ro:string,en:string)=>lang==="ro"?ro:en;
- useEffect(()=>{const l=localStorage.getItem("br-language");if(l==="en")setLang("en")},[]);
- useEffect(()=>{document.documentElement.lang=lang;localStorage.setItem("br-language",lang)},[lang]);
+ const [cookiesOpen,setCookiesOpen]=useState(false);
+ useEffect(()=>{
+  try{
+   const choice=localStorage.getItem(preferenceKey);
+   if(choice==="language"&&localStorage.getItem(languageKey)==="en")setLang("en");
+   if(choice!=="language"&&choice!=="necessary"&&detail?.kind!=="privacy")setCookiesOpen(true);
+  }catch{
+   if(detail?.kind!=="privacy")setCookiesOpen(true);
+  }
+ },[detail?.kind]);
+ useEffect(()=>{document.documentElement.lang=lang},[lang]);
+ function switchLanguage(){
+  const next=lang==="ro"?"en":"ro";
+  setLang(next);
+  try{if(localStorage.getItem(preferenceKey)==="language")localStorage.setItem(languageKey,next)}catch{}
+ }
  useSiteMotion();
  const nav=[t("Servicii","Services"),t("Expertiză","Expertise"),t("Cum lucrăm","Our process"),t("Despre noi","About"),t("Resurse","Insights")];const ids=["servicii","expertiza","proces","despre","resurse"];
  const launch=(v="")=>{setCode(v);setQuote(true);setMenu(false)};
@@ -28,11 +43,11 @@ export function BlueRoute({detail}:{detail?:Detail}){
  ];
  return <>
  <a className="skip-link" href="#continut">{t("Salt la conținut","Skip to content")}</a>
- <header className="site-header"><div className="nav-wrap"><Brand/><nav id="primary-navigation" className={menu?"main-nav open":"main-nav"} aria-label={t("Navigare principală","Main navigation")}>{nav.map((n,i)=><a href={`${detail?"/":""}#${ids[i]}`} key={ids[i]} onClick={()=>setMenu(false)}>{n}</a>)}</nav><div className="nav-actions"><button className="language" onClick={()=>setLang(lang==="ro"?"en":"ro")} aria-label={t("Switch to English","Schimbă în română")}><Globe size={14}/>{lang.toUpperCase()}</button><button className="button small" onClick={()=>launch()}>{t("Solicită o ofertă","Get a quote")}<ArrowUpRight size={16}/></button><button className="menu-toggle icon-button" aria-label={t("Meniu","Menu")} aria-controls="primary-navigation" aria-expanded={menu} onClick={()=>setMenu(!menu)}>{menu?<X/>:<Menu/>}</button></div></div></header>
+ <header className="site-header"><div className="nav-wrap"><Brand/><nav id="primary-navigation" className={menu?"main-nav open":"main-nav"} aria-label={t("Navigare principală","Main navigation")}>{nav.map((n,i)=><a href={`${detail?"/":""}#${ids[i]}`} key={ids[i]} onClick={()=>setMenu(false)}>{n}</a>)}</nav><div className="nav-actions"><button className="language" onClick={switchLanguage} aria-label={t("Switch to English","Schimbă în română")}><Globe size={14}/>{lang.toUpperCase()}</button><a href="/admin" className="nav-admin">{t("Administrare","Admin")}</a><button className="button small" onClick={()=>launch()}>{t("Solicită o ofertă","Get a quote")}<ArrowUpRight size={16}/></button><button className="menu-toggle icon-button" aria-label={t("Meniu","Menu")} aria-controls="primary-navigation" aria-expanded={menu} onClick={()=>setMenu(!menu)}>{menu?<X/>:<Menu/>}</button></div></div></header>
  <main id="continut">
  {detail?<>
  <section className="detail-hero container"><a className="back-link" href="/">← {t("Înapoi la pagina principală","Back to homepage")}</a><div className="eyebrow"><i/>{service?t("SERVICII SPECIALIZATE","SPECIALISED SERVICES"):article?t(article.category,article.categoryEn):t("DATE & CONFIDENȚIALITATE","DATA & PRIVACY")}</div><h1>{service?t(service.ro,service.en):article?t(article.ro,article.en):t("Confidențialitate, cu claritate.","Privacy, with clarity.")}</h1><p className="lead">{service?t(service.desc,service.descEn):article?t("Note practice pentru o ofertare bine organizată.","Practical notes for a well-organised tender."):t("Informații despre datele transmise prin formular.","Information about data submitted through our form.")}</p></section>
- <section className="detail-body container">{service?<div className="detail-columns"><div><h2>{t("Atenție la fiecare cerință.","Attention to every requirement.")}</h2><p>{t(service.body,service.bodyEn)}</p><h3>{t("Ce include serviciul","Service scope")}</h3><ul className="check-list">{(lang==="ro"?service.items:service.itemsEn).map(i=><li key={i}><Check size={18}/>{i}</li>)}</ul><p>{t("Livrabilele și calendarul se stabilesc în oferta de servicii, în funcție de documentația procedurii.","Deliverables and timing are agreed in the service quotation based on the procedure documentation.")}</p></div><aside className="detail-aside"><Compass size={32}/><h3>{t("Ai un proiect în pregătire?","Planning a project?")}</h3><p>{t("Spune-ne numărul procedurii și de ce ai nevoie. Pornim de la detaliile proiectului tău.","Tell us your procedure number and requirements. We start with your project details.")}</p><button className="button" onClick={()=>launch()}>{t("Solicită o ofertă","Request a quote")}<ArrowUpRight size={18}/></button></aside></div>:article?<article className="article-body"><div className="article-meta"><Clock3 size={15}/>{article.time} · {t("Ghid orientativ","General guide")}</div>{(lang==="ro"?article.paragraphs:article.paragraphsEn).map((p,i)=><p key={i}>{p}</p>)}<div className="article-note">{t("Material informativ general. Verifică întotdeauna cerințele și clarificările oficiale ale procedurii tale.","General information. Always verify the official requirements and clarifications for your specific procedure.")}</div><button className="button" onClick={()=>launch()}>{t("Discută despre licitația ta","Discuss your tender")}<ArrowUpRight size={18}/></button></article>:<article className="article-body"><h2>{t("Ce informații colectează formularul","Information collected by the form")}</h2><p>{t("Formularul colectează datele de contact și ale firmei, informațiile despre licitație, serviciile solicitate și documentele pe care alegi să le atașezi. Acestea sunt folosite pentru analiza solicitării și pregătirea unei oferte de servicii.","The form collects company and contact information, tender details, requested services and documents you choose to attach. These are used to assess your request and prepare a service quotation.")}</p><h3>{t("Acces și stocare","Access and storage")}</h3><p>{t("Solicitările sunt stocate în baza de date a aplicației, iar fișierele în spațiul privat de stocare. Accesul la administrare necesită un cont autorizat. Site-ul nu folosește cookie-uri de publicitate sau instrumente de analiză. Preferința de limbă se salvează local în browser.","Requests are stored in the application database and files in private storage. Administration requires an authorised account. The site uses no advertising cookies or analytics. Your language preference is stored locally in your browser.")}</p><h3>{t("Datele operatorului","Controller details")}</h3><dl className="review-list">
+ <section className="detail-body container">{service?<div className="detail-columns"><div><h2>{t("Atenție la fiecare cerință.","Attention to every requirement.")}</h2><p>{t(service.body,service.bodyEn)}</p><h3>{t("Ce include serviciul","Service scope")}</h3><ul className="check-list">{(lang==="ro"?service.items:service.itemsEn).map(i=><li key={i}><Check size={18}/>{i}</li>)}</ul><p>{t("Livrabilele și calendarul se stabilesc în oferta de servicii, în funcție de documentația procedurii.","Deliverables and timing are agreed in the service quotation based on the procedure documentation.")}</p></div><aside className="detail-aside"><Compass size={32}/><h3>{t("Ai un proiect în pregătire?","Planning a project?")}</h3><p>{t("Spune-ne numărul procedurii și de ce ai nevoie. Pornim de la detaliile proiectului tău.","Tell us your procedure number and requirements. We start with your project details.")}</p><button className="button" onClick={()=>launch()}>{t("Solicită o ofertă","Request a quote")}<ArrowUpRight size={18}/></button></aside></div>:article?<article className="article-body"><div className="article-meta"><Clock3 size={15}/>{article.time} · {t("Ghid orientativ","General guide")}</div>{(lang==="ro"?article.paragraphs:article.paragraphsEn).map((p,i)=><p key={i}>{p}</p>)}<div className="article-note">{t("Material informativ general. Verifică întotdeauna cerințele și clarificările oficiale ale procedurii tale.","General information. Always verify the official requirements and clarifications for your specific procedure.")}</div><button className="button" onClick={()=>launch()}>{t("Discută despre licitația ta","Discuss your tender")}<ArrowUpRight size={18}/></button></article>:<article className="article-body"><h2>{t("Ce informații colectează formularul","Information collected by the form")}</h2><p>{t("Formularul colectează datele de contact și ale firmei, informațiile despre licitație, serviciile solicitate și documentele pe care alegi să le atașezi. Acestea sunt folosite pentru analiza solicitării și pregătirea unei oferte de servicii.","The form collects company and contact information, tender details, requested services and documents you choose to attach. These are used to assess your request and prepare a service quotation.")}</p><h3>{t("Acces și stocare","Access and storage")}</h3><p>{t("Solicitările sunt stocate în baza de date a aplicației, iar fișierele în spațiul privat de stocare. Accesul la administrare necesită un cont autorizat. Site-ul nu folosește cookie-uri de publicitate sau instrumente de analiză. Alegerea privind stocarea este reținută în browser. Limba se salvează pentru vizitele viitoare dacă activezi această opțiune. Panoul de administrare folosește un cookie de sesiune.","Requests are stored in the application database and files in private storage. Administration requires an authorised account. The site uses no advertising cookies or analytics. Your cookie preference is stored in your browser. The language is saved for future visits if you enable that option. The administration area uses a session cookie.")}</p><h3>{t("Datele operatorului","Controller details")}</h3><dl className="review-list">
  <div><dt>{t("Denumire legală","Legal name")}</dt><dd>{company.name}</dd></div>
  <div><dt>{t("Sediu social","Registered office")}</dt><dd>{company.registeredOffice}</dd></div>
  <div><dt>{t("CUI","Tax ID (CUI)")}</dt><dd>{company.cui}</dd></div>
@@ -90,6 +105,7 @@ export function BlueRoute({detail}:{detail?:Detail}){
     </a>
     <nav aria-label={t("Informații legale","Legal information")}>
      <a href="/confidentialitate"><LockKeyhole size={16} aria-hidden="true"/>{t("Confidențialitate și GDPR","Privacy and GDPR")}</a>
+     <button type="button" onClick={()=>setCookiesOpen(true)}>{t("Preferințe cookies","Cookie preferences")}</button>
      <a href="https://anpc.ro/">ANPC<ArrowUpRight size={14} aria-hidden="true"/></a>
      <a href="https://www.dataprotection.ro/index.jsp?page=Transmiterea_plangerilor_catre_ANSPDCP">ANSPDCP<ArrowUpRight size={14} aria-hidden="true"/></a>
     </nav>
@@ -100,6 +116,7 @@ export function BlueRoute({detail}:{detail?:Detail}){
    </div>
   </div>
  </footer>
+ <CookiePreferences lang={lang} open={cookiesOpen} onClose={()=>setCookiesOpen(false)}/>
  {quote&&<QuoteForm lang={lang} initialCode={code} onClose={()=>setQuote(false)}/>}
  </>;
 }

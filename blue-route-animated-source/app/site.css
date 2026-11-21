@@ -52,6 +52,41 @@
 .admin-stat,
 .status{font-size:10px;letter-spacing:.04em}
 .brand small{font-size:8px;letter-spacing:.04em}
+.site-header{background:#fff;border-color:#dbe6f4}
+.nav-wrap{max-width:1280px}
+.nav-actions{gap:12px}
+.nav-actions .language,.nav-admin{font-size:13px;font-weight:650;color:var(--ink)}
+.nav-actions .language{min-height:40px;padding:0 9px;border-radius:8px}
+.nav-actions .language:hover{background:#edf4ff}
+.nav-admin{display:inline-flex;align-items:center;min-height:40px;padding:0 14px;border:1px solid #cad8ec;border-radius:8px}
+.nav-admin:hover{background:#edf4ff;color:#1747a6}
+.nav-actions>.button{min-height:40px;padding:10px 14px;gap:9px;border-radius:8px;font-size:13px}
+@media(min-width:901px){.main-nav{font-size:13px;font-weight:600}.nav-wrap{height:76px;gap:20px}}
+@media(max-width:1100px){.nav-admin{display:none}}
+@media(max-width:600px){.nav-actions{gap:7px}.nav-actions .language{padding-inline:6px}}
+.cookie-panel{position:fixed;inset:auto 0 0;margin:0;width:100%;max-width:none;max-height:80dvh;overflow:auto;border:0;border-top:3px solid var(--blue);background:#fff;color:var(--ink);box-shadow:0 -12px 44px #071b3520}
+.cookie-panel::backdrop{background:#07172c74}
+.cookie-panel-inner{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:16px 22px;max-width:1280px;margin:auto;padding:20px clamp(18px,4vw,36px)}
+.cookie-symbol{display:grid;place-items:center;width:48px;height:48px;border-radius:14px;background:#eaf1ff;color:#175bfb}
+.cookie-information h2{margin-bottom:5px;font-size:19px;font-weight:750;letter-spacing:-.025em}
+.cookie-information p{font-size:13px;line-height:1.55;color:#40516b}
+.cookie-information a{color:#1747a6;text-decoration:underline;text-underline-offset:2px}
+.cookie-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.cookie-actions button{min-height:42px;border:1px solid var(--blue);border-radius:8px;padding:9px 12px;background:var(--blue);color:white;font-size:13px;font-weight:700}
+.cookie-actions button:hover{background:#1049d8}
+.cookie-actions .cookie-outline{background:white;color:#173257;border-color:#bacbe2}
+.cookie-actions .cookie-outline:hover{background:#eff5ff}
+.cookie-option{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:14px;font-weight:600}
+.footer-legal nav button{min-height:34px;background:transparent;color:#d4e1f2;font-size:12px;font-weight:600;text-align:left}
+.footer-legal nav button:hover{text-decoration:underline;text-underline-offset:4px}
+@media(max-width:1000px){.cookie-actions{grid-column:2}}
+@media(max-width:540px){
+ .cookie-panel-inner{gap:13px;padding:16px 16px 18px}
+ .cookie-symbol{width:36px;height:36px;align-self:start}
+ .cookie-symbol svg{width:21px;height:21px}
+ .cookie-actions{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+ .cookie-actions .cookie-outline{grid-column:1/-1}
+}
 .admin-shell{background:#f4f7fb}
 .admin-header{min-height:72px;padding:16px clamp(16px,3vw,44px);gap:12px}
 .admin-header .brand-logo{filter:brightness(0) invert(1)}
