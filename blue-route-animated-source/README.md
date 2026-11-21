@@ -21,7 +21,7 @@ Site responsive RO/EN pentru consultanță în achiziții publice, cu pagini de 
 
 ### Opționale
 
-`RESEND_API_KEY`, `NOTIFY_EMAIL`, `MAIL_FROM`: notificarea echipei la primirea unei solicitări. Domeniul expeditorului trebuie validat la Resend. Fără configurare, solicitările se salvează în panou; nu se trimite e-mail.
+`RESEND_API_KEY` și `MAIL_FROM`: configurează-le în Vercel pentru e-mailurile de notificare. Folosește o adresă de expeditor de pe un domeniu verificat în Resend, de exemplu `BLUE ROUTE <notificari@blueroute.ro>` dacă domeniul este verificat acolo. Notificarea în HTML se trimite la `contact@blueroute.ro`. Include câmpurile completate, lista de documente și un link către panoul de administrare. Fără aceste două variabile, solicitările se salvează în panou fără notificare prin e-mail.
 
 `SEAP_PROVIDER_URL`, `SEAP_PROVIDER_TOKEN`: sursă HTTPS autorizată pentru precompletare. GET cu parametrul `code`; răspuns JSON cu stringurile `title`, `authority`, `deadline` (YYYY-MM-DD), `value`. În lipsa integrării sau la eroare, formularul permite completarea manuală. Nu sunt extrase automat date din paginile SEAP.
 

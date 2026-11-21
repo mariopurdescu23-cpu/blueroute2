@@ -4,6 +4,7 @@ import {requestSchema,MAX_UPLOAD} from "@/lib/request-validation";
 import {isAdmin,sameOrigin} from "@/lib/admin-auth";
 import {byRequestKey,displayRow} from "@/lib/request-store";
 import {verifyUpload} from "@/lib/upload-receipt";
+import {sendRequestEmail} from "@/lib/request-email";
 export const dynamic="force-dynamic";
 export const runtime="nodejs";
 const submission=requestSchema.extend({uploads:z.array(z.string().max(2000)).max(8).default([])});
@@ -28,8 +29,12 @@ export async function POST(req:Request){
  const {website,requestKey,uploads,...record}=data;void website;void uploads;
  const {error}=await db.from("requests").insert({id,reference,request_key:requestKey,data:record,files:files.map(({key,name,size})=>({key,name,size}))});
  if(error){const duplicate=await byRequestKey(requestKey);if(duplicate)return Response.json(duplicate);throw error}
- if(process.env.RESEND_API_KEY&&process.env.NOTIFY_EMAIL&&process.env.MAIL_FROM){
-  try{const r=await fetch("https://api.resend.com/emails",{method:"POST",headers:{Authorization:`Bearer ${process.env.RESEND_API_KEY}`,"Content-Type":"application/json"},body:JSON.stringify({from:process.env.MAIL_FROM,to:[process.env.NOTIFY_EMAIL],subject:`BLUE ROUTE · ${reference}`,text:`Solicitare ${reference}\nCompanie: ${data.company}\nContact: ${data.name}, ${data.email}, ${data.phone}\nProcedură: ${data.code}\nProiect: ${data.title}\nServicii: ${data.services.join(", ")}\nTermen: ${data.deadline||"nespecificat"}\nDocumente: ${files.length}\nDetaliile sunt disponibile în panoul de administrare.`,reply_to:data.email})});await db.from("requests").update({notification:r.ok?"sent":"failed"}).eq("id",id)}catch{await db.from("requests").update({notification:"failed"}).eq("id",id)}
+ const notification=await sendRequestEmail(reference,record,files);
+ if(notification!=="not_configured"){
+  try{
+   const {error:statusError}=await db.from("requests").update({notification}).eq("id",id);
+   if(statusError)console.error("Request email status could not be saved",{reference});
+  }catch{console.error("Request email status could not be saved",{reference})}
  }
  return Response.json({reference},{status:201});
  }catch{return Response.json({error:"Solicitarea nu a putut fi salvată. Te rugăm să încerci din nou."},{status:503})}
