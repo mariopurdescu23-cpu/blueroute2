@@ -59,12 +59,10 @@ function formatRequestEmail(reference: string, data: RequestDetails, files: Docu
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f2f5fa">
    <tr><td align="center" style="padding:24px 12px">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:620px;background:#fff;border:1px solid #e0e6ed;border-radius:12px">
-     <tr><td style="padding:22px 24px;background:#fff;border-top:4px solid #175bfb;border-radius:12px 12px 0 0">
+     <tr><td style="padding:22px 24px;background:#fff;border-top:4px solid #175bfb;border-bottom:1px solid #e0e6ed;border-radius:12px 12px 0 0">
       <img src="${siteUrl}/blue-route-logo.png" alt="BLUE ROUTE" width="210" height="35" style="display:block;width:210px;max-width:100%;height:auto;color:#071b35;font-size:20px;font-weight:bold">
-     </td></tr>
-     <tr><td style="padding:20px 24px;background:#071b35;color:#fff">
-      <h1 style="margin:8px 0;font-size:25px;line-height:1.2">Solicitare nouă de ofertă</h1>
-      <div style="color:#dbe7ff;font-size:14px">${escapeHtml(reference)}</div>
+      <h1 style="margin:20px 0 6px;color:#071b35;font-size:25px;line-height:1.2">Solicitare nouă de ofertă</h1>
+      <div style="color:#536276;font-size:14px">${escapeHtml(reference)}</div>
      </td></tr>
      <tr><td style="padding:0 24px 24px">
       ${sections}
