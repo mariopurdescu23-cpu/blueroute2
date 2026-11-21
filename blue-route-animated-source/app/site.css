@@ -52,6 +52,20 @@
 .admin-stat,
 .status{font-size:10px;letter-spacing:.04em}
 .brand small{font-size:8px;letter-spacing:.04em}
+.site-footer .footer-top{grid-template-columns:2fr 1fr 1.25fr;padding-bottom:36px}
+.site-footer .footer-top>.footer-links:last-child{display:flex}
+.footer-company address{display:grid;gap:5px;margin-top:16px;max-width:36ch;color:#b5c5d9;font:normal 12px/1.55 var(--font-sans)}
+.footer-company strong{color:white}
+.site-footer .footer-links{font-size:13px}
+.site-footer .footer-links>span:first-child{color:#b5c5d9;margin-bottom:1px}
+.footer-legal{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;padding:15px 0;border-top:1px solid #ffffff24}
+.footer-sal{display:block;width:250px;max-width:100%}
+.footer-sal img{display:block;width:100%;height:auto}
+.footer-legal nav{display:flex;flex-wrap:wrap;gap:8px 16px}
+.footer-legal nav a{display:inline-flex;align-items:center;gap:6px;min-height:34px;font-size:12px;font-weight:600;color:#d4e1f2}
+.site-footer .footer-bottom{justify-content:space-between;align-items:center;gap:10px 20px;color:#b5c5d9;font-size:11px;letter-spacing:normal}
+.site-footer a:hover{text-decoration:underline;text-underline-offset:4px}
+@media(max-width:600px){.site-footer .footer-top{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:24px 16px}.site-footer .footer-links{overflow-wrap:anywhere}}
 .quick-input>span{
  flex-shrink:0;
  margin-left:8px;

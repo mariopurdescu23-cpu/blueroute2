@@ -1,6 +1,6 @@
 "use client";
 import {useEffect,useState} from "react";
-import {ArrowUpRight,ArrowRight,ArrowDown,Menu,X,Check,ShieldCheck,FileText,Layers,MoveUpRight,Plus,Minus,Globe,Compass,Clock3} from "lucide-react";
+import {ArrowUpRight,ArrowRight,ArrowDown,Menu,X,Check,ShieldCheck,LockKeyhole,FileText,Layers,MoveUpRight,Plus,Minus,Globe,Compass,Clock3} from "lucide-react";
 import {services,domains,articles} from "@/lib/content";
 import {QuoteForm} from "./quote-form";
 import {company} from "@/lib/company";
@@ -59,7 +59,47 @@ export function BlueRoute({detail}:{detail?:Detail}){
  <section className="faq-section section-space container"><div><div className="eyebrow"><i/>{t("ÎNTREBĂRI FRECVENTE","COMMON QUESTIONS")}</div><h2>{t("Bine de știut.","Good to know.")}</h2><p>{t("Câteva răspunsuri, înainte să începem.","A few answers before we begin.")}</p></div><div className="faq-list">{faqs.map((f,i)=><div className={`faq-item ${faq===i?"expanded":""}`} key={i}><button aria-expanded={faq===i} aria-controls={`faq-${i}`} onClick={()=>setFaq(faq===i?null:i)}>{f[0]}{faq===i?<Minus size={19}/>:<Plus size={19}/>}</button><div id={`faq-${i}`} className="faq-answer" aria-hidden={faq!==i} inert={faq!==i}><div><p>{f[1]}</p></div></div></div>)}</div></section>
  <section className="contact-section" id="contact"><div className="contact-grid"/><div className="container contact-inner"><div className="eyebrow"><i/>06 / {t("URMĂTORUL PAS","THE NEXT STEP")}</div><div className="contact-main"><h2>{t("Ai proiectul.","You have the project.")}<br/>{t("Hai să-i dăm","Let's give it")} <em>{t("direcție.","direction.")}</em></h2><button className="contact-circle" onClick={()=>launch()} aria-label={t("Solicită o ofertă","Request a quote")}><ArrowUpRight size={38}/></button></div><div className="contact-bottom"><p>{t("Trimite-ne licitația ta. Construim împreună următorul pas.","Share your tender. Let's build the next step together.")}</p><button className="button white" onClick={()=>launch()}>{t("Solicită o ofertă de consultanță","Request a consulting quote")}<ArrowUpRight size={18}/></button></div></div></section>
  </>}
- </main><footer className="site-footer"><div className="container"><div className="footer-top"><div><Brand/><p>{t("O direcție clară pentru proiecte ambițioase.","A clear direction for ambitious projects.")}</p></div><div className="footer-links"><span>{t("EXPLORARE","EXPLORE")}</span><a href="/#servicii">{t("Servicii","Services")}</a><a href="/#expertiza">{t("Expertiză","Expertise")}</a><a href="/#resurse">{t("Resurse","Insights")}</a></div><div className="footer-links"><span>CONTACT</span>{company.placeholder?<><span className="contact-placeholder">{company.email}</span><span className="contact-placeholder">{company.phone}</span></>:<><a href={`mailto:${company.email}`}>{company.email}</a><a href={`tel:${company.phone.replace(/[^+0-9]/g,"")}`}>{company.phone}</a>{company.whatsapp&&<a href={`https://wa.me/${company.whatsapp.replace(/\D/g,"")}`} target="_blank" rel="noreferrer">WhatsApp ↗</a>}</>}{company.placeholder&&<small>{t("Date de contact demonstrative","Placeholder contact details")}</small>}</div><div className="footer-links"><span>{t("SĂ ÎNCEPEM","LET'S BEGIN")}</span><button className="text-button" onClick={()=>launch()}>{t("Discută un proiect","Discuss a project")}<ArrowUpRight size={16}/></button><span>ROMÂNIA · RO / EN</span></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} {company.name} · {t("CUI","Tax ID")} {company.cui} · {company.registrationNumber}</span><a href="/confidentialitate">{t("Confidențialitate","Privacy")}</a><a href="/admin">{t("Administrare","Administration")}<ArrowUpRight size={12}/></a><span>BUILT ON PRECISION.</span></div></div></footer>
+ </main>
+ <footer className="site-footer">
+  <div className="container">
+   <div className="footer-top">
+    <div className="footer-company">
+     <Brand/>
+     <address>
+      <strong>{company.name}</strong>
+      <span>{t("CUI","Tax ID")} {company.cui} · {company.registrationNumber}</span>
+      <span>{company.registeredOffice}</span>
+     </address>
+    </div>
+    <div className="footer-links">
+     <span>{t("EXPLOREAZĂ","EXPLORE")}</span>
+     <a href="/#servicii">{t("Servicii","Services")}</a>
+     <a href="/#expertiza">{t("Expertiză","Expertise")}</a>
+     <a href="/#resurse">{t("Resurse","Insights")}</a>
+    </div>
+    <div className="footer-links">
+     <span>CONTACT</span>
+     <a href={`mailto:${company.email}`}>{company.email}</a>
+     <a href={`tel:${company.phone}`}>{company.phone}</a>
+     <button type="button" className="text-button" onClick={()=>launch()}>{t("Discută un proiect","Discuss a project")}<ArrowUpRight size={16}/></button>
+    </div>
+   </div>
+   <div className="footer-legal">
+    <a className="footer-sal" href="https://reclamatiisal.anpc.ro">
+     <img src="/anpc-sal.png" width={250} height={50} alt={t("ANPC · Soluționarea alternativă a litigiilor","ANPC · Alternative dispute resolution")}/>
+    </a>
+    <nav aria-label={t("Informații legale","Legal information")}>
+     <a href="/confidentialitate"><LockKeyhole size={16} aria-hidden="true"/>{t("Confidențialitate și GDPR","Privacy and GDPR")}</a>
+     <a href="https://anpc.ro/">ANPC<ArrowUpRight size={14} aria-hidden="true"/></a>
+     <a href="https://www.dataprotection.ro/index.jsp?page=Transmiterea_plangerilor_catre_ANSPDCP">ANSPDCP<ArrowUpRight size={14} aria-hidden="true"/></a>
+    </nav>
+   </div>
+   <div className="footer-bottom">
+    <p>© {new Date().getFullYear()} {company.name}. {t("Toate drepturile rezervate.","All rights reserved.")}</p>
+    <a href="/admin">{t("Administrare","Administration")}<ArrowUpRight size={12} aria-hidden="true"/></a>
+   </div>
+  </div>
+ </footer>
  {quote&&<QuoteForm lang={lang} initialCode={code} onClose={()=>setQuote(false)}/>}
  </>;
 }
