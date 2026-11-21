@@ -53,6 +53,7 @@ export function BlueRoute({detail}:{detail?:Detail}){
  <div><dt>{t("Sediu social","Registered office")}</dt><dd>{company.registeredOffice}</dd></div>
  <div><dt>{t("CUI","Tax ID (CUI)")}</dt><dd>{company.cui}</dd></div>
  <div><dt>{t("Registrul Comerțului","Trade Register")}</dt><dd>{company.registrationNumber}</dd></div>
+  <div><dt>{t("Capital social","Share capital")}</dt><dd>{t(`${company.shareCapitalLei.toLocaleString("ro-RO")} lei`,`RON ${company.shareCapitalLei.toLocaleString("en-GB")}`)}</dd></div>
  <div><dt>EUID</dt><dd>{company.euid}</dd></div>
  <div><dt>Contact</dt><dd><a href={`mailto:${company.email}`}>{company.email}</a><br/><a href={`tel:${company.phone}`}>{company.phone}</a></dd></div>
  </dl><p>{t("Pentru întrebări sau solicitări privind datele tale personale, scrie-ne la","For questions or requests about your personal data, email us at")} <a href={`mailto:${company.email}`}>{company.email}</a>.</p></article>}</section>
@@ -84,6 +85,7 @@ export function BlueRoute({detail}:{detail?:Detail}){
      <address>
       <strong>{company.name}</strong>
       <span>{t("CUI","Tax ID")} {company.cui} · {company.registrationNumber}</span>
+     <span>{t(`Capital social ${company.shareCapitalLei.toLocaleString("ro-RO")} lei`,`Share capital RON ${company.shareCapitalLei.toLocaleString("en-GB")}`)}</span>
       <span>{company.registeredOffice}</span>
      </address>
     </div>
