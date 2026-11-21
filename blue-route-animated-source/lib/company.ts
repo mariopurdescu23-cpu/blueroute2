@@ -1,2 +1,1 @@
-// Complete these values when the real company contacts are available.
-export const company={email:"contact@blueroute.example",phone:"+40 7xx xxx xxx",whatsapp:"",placeholder:true};
+export const company={email:"contact@blueroute.ro",phone:"0754989649",whatsapp:"",placeholder:false};
