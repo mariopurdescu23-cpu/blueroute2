@@ -40,7 +40,7 @@ Sesiunea de administrare folosește un cookie HttpOnly, Secure în producție, S
 - RO/EN, navigare mobilă, animații cu preferință de mișcare redusă, pagini de servicii și articole.
 - Formular: licitație, servicii, companie/contact/documente, verificare și referință de înregistrare.
 - Administrare: căutare, filtre, statusuri, termene apropiate, documente, onorariu și calendar de prestare, note interne, CSV, ofertă imprimabilă/PDF și deschidere e-mail pentru verificare.
-- Datele firmei și contactele sunt placeholders în `lib/company.ts`, conform cererii utilizatorului. Completează și informarea de confidențialitate și subsolul ofertei PDF înainte de utilizare reală.
+- Datele de identificare și contact ale firmei sunt centralizate în `lib/company.ts` și reutilizate în pagina de confidențialitate, în subsol și în ofertele pregătite din panou.
 - Portofoliul conține scenarii explicit ilustrative. Nu sunt declarate proiecte sau rezultate neverificate.
 
 ## Dezvoltare
